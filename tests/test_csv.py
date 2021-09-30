@@ -12,11 +12,13 @@ import unittest
 from pathlib import Path
 import sys
 import os
+import pathlib
 import json
-import plotly.graph_objects as go
+
 
 # import package
-from parsers.parsers import DataFileParser
+from sparse.parsers import DataFileParser
+from sparse.utils import show_plot
 
 class TestReadCsv(unittest.TestCase):
 
@@ -33,11 +35,9 @@ class TestReadCsv(unittest.TestCase):
         # path to parent directory
         cls.data_dir = Path(__file__).resolve().parent.parent
 
-        # data directory + file name
-        cls.data_file = (
-            'test_input'
-            + os.sep
-            + 'dow_moe_rev5_cal_001.csv'
+        # get the data file field from object
+        cls.data_file = os.path.join(
+            cls.data_dir, 'test_input' + os.sep + 'dow_moe_rev5_cal_001.csv'
         )
 
         sys.stdout.write('SUCCESS ')
@@ -49,6 +49,26 @@ class TestReadCsv(unittest.TestCase):
 
         sys.stdout.write('\n\nTesting _is_csv_valid()...\n')
 
+
+        # get the file extension, make lowercase
+        ext = pathlib.Path(self.data_file).suffix
+        ext = ext.lower()
+
+        # open the data file
+        with open(self.data_file) as df:
+
+            # new instance of parser class
+            test_csv = DataFileParser(f_obj=df, f_type=ext)
+
+            # test _read_csv() method
+            test_valid = test_csv._is_csv_valid()
+
+        # assert output is as expected
+        self.assertEqual(test_valid, True)
+
+        # plot results for visual check
+        #show_plot(test_wv, test_vals)
+
         sys.stdout.write('\n PASSED')
 
     def test_read_csv(self):
@@ -58,10 +78,26 @@ class TestReadCsv(unittest.TestCase):
 
         sys.stdout.write('\n\nTesting _read_csv()...\n')
 
-        # new instance of parser class
-        test_csv = DataFileParser(self.data_file)
+        # get the file extension, make lowercase
+        ext = pathlib.Path(self.data_file).suffix
+        ext = ext.lower()
 
-        test_read = test_csv._read_csv()
+        # open the data file
+        with open(self.data_file) as df:
+
+            # new instance of parser class
+            test_csv = DataFileParser(f_obj=df, f_type=ext)
+
+            # test _read_csv() method
+            test_wv, test_vals = test_csv._read_csv()
+
+        # assert output is as expected
+        self.assertGreater(len(test_wv), 0)
+        self.assertGreater(len(test_vals), 0)
+        self.assertEqual(len(test_wv), len(test_vals))
+
+        # plot results for visual check
+        #show_plot(test_wv, test_vals)
 
         sys.stdout.write('\n PASSED')
 
@@ -70,7 +106,24 @@ class TestReadCsv(unittest.TestCase):
         Test is_valid() method for csv files.
         """
 
-        sys.stdout.write('\n\nTesting read_data()...\n')
+        sys.stdout.write('\n\nTesting is_valid()...\n')
+
+
+        # get the file extension, make lowercase
+        ext = pathlib.Path(self.data_file).suffix
+        ext = ext.lower()
+
+        # open the data file
+        with open(self.data_file) as df:
+
+            # new instance of parser class
+            test_csv = DataFileParser(f_obj=df, f_type=ext)
+
+            # test _read_csv() method
+            test_valid = test_csv.is_valid()
+
+        # assert output is as expected
+        self.assertEqual(test_valid, True)
 
         sys.stdout.write('\n PASSED')
 
@@ -81,6 +134,27 @@ class TestReadCsv(unittest.TestCase):
         """
 
         sys.stdout.write('\n\nTesting read_data()...\n')
+
+        # get the file extension, make lowercase
+        ext = pathlib.Path(self.data_file).suffix
+        ext = ext.lower()
+
+        # open the data file
+        with open(self.data_file) as df:
+
+            # new instance of parser class
+            test_csv = DataFileParser(f_obj=df, f_type=ext)
+
+            # test _read_csv() method
+            test_wv, test_vals = test_csv.read_data()
+
+        # assert output is as expected
+        self.assertGreater(len(test_wv), 0)
+        self.assertGreater(len(test_vals), 0)
+        self.assertEqual(len(test_wv), len(test_vals))
+
+        # plot results for visual check
+        #show_plot(test_wv, test_vals)
 
         sys.stdout.write('\n PASSED')
 
