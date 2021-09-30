@@ -165,6 +165,7 @@ class DataFileParser():
         """
         Reads jcamp formatted files.
         """
+        raise NotImplementedError
 
     def _read_spa(self):
         """
@@ -213,6 +214,7 @@ class DataFileParser():
         """
         Reads JSON formatted files.
         """
+        raise NotImplementedError
 
     def _read_txt(self):
         """
@@ -321,6 +323,7 @@ class DataFileParser():
     def _is_jcamp_valid(self):
         """
         """
+        raise NotImplementedError
 
     def _is_spa_valid(self):
         """
@@ -374,6 +377,7 @@ class DataFileParser():
     def _is_json_valid(self):
         """
         """
+        raise NotImplementedError
 
     def _is_txt_valid(self):
         """
