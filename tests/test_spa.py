@@ -88,6 +88,7 @@ class TestReadSpa(unittest.TestCase):
         # open the data file
         with open(self.data_file, 'rb') as df:
 
+            sys.stdout.write(str(df.read()))
 
             # new instance of parser class
             test_spa = DataFileParser(f_obj=df, f_type=ext)

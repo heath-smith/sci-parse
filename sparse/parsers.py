@@ -43,6 +43,16 @@ class DataFileParser():
         self.many = many
         self.errors = None
         self.default_message = "No errors found."
+        self.x_data = []
+        self.y_data = []
+
+    def get_x_data(self):
+        """"""
+        return self.x_data
+
+    def get_y_data(self):
+        """"""
+        return self.y_data
 
     """ reader factory """
     def read_data(self):
@@ -159,6 +169,9 @@ class DataFileParser():
             # add logging here
             raise IOError(e)
 
+        self.x_data = x_data
+        self.y_data = y_data
+
         return (x_data, y_data)
 
     def _read_jcamp(self):
@@ -179,19 +192,19 @@ class DataFileParser():
 
         f.seek(564)
         points = np.fromfile(f, np.int32, 1)[0]
-        #print('Points: ', points)
+        print('Points: ', points)
 
         f.seek(30)
         titles = np.fromfile(f, np.uint8, 255)
         titles = ''.join([chr(x) for x in titles if x != 0])
-        #print('Titles: ', titles)
+        print('Titles: ', titles)
 
 
         f.seek(576)
         max_wv = np.fromfile(f, np.single, 1)[0]
         min_wv = np.fromfile(f, np.single, 1)[0]
         wv_nums = np.flip(np.linspace(min_wv, max_wv, points))
-        #print('Wavenumbers: ', wv_nums)
+        print('Wavenumbers: ', wv_nums)
 
         f.seek(288)
         flag = 0
@@ -203,10 +216,14 @@ class DataFileParser():
         f.seek(data_pos[0])
 
         spectra = np.fromfile(f, np.single, points)
-        #print('Spectra: ', spectra)
+        print('Spectra: ', spectra)
 
         # scale wv numbers to nanometers
         wv_nums = [1.0E7/x for x in wv_nums]
+
+
+        self.x_data = wv_nums
+        self.y_data = spectra
 
         return (wv_nums, spectra)
 
@@ -242,6 +259,9 @@ class DataFileParser():
                 y_data.append(float(r_split[1]))
             except:
                 pass
+
+        self.x_data = x_data
+        self.y_data = y_data
 
         return (x_data, y_data)
 
