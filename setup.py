@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='sparse',
-    version='1.0.2',
+    version='1.0.3',
     description='Spectral data file parser library.',
     url='',
     author='Heath Smith',

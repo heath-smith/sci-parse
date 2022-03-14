@@ -7,11 +7,7 @@ files.
 """
 
 # import dependencies
-import csv, json, io, pathlib
-from csv import Sniffer
-from os import read
-
-from numpy.lib.arraysetops import isin
+import csv
 import numpy as np
 
 
@@ -22,7 +18,7 @@ class DataFileParser():
     (Factory Design)
     """
 
-    def __init__(self, f_obj=None, f_type=None, delimiter=',', many=False):
+    def __init__(self, f_obj=None, f_type=None, delimiter=',', cols=2):
         """
         Initialize parser class.
 
@@ -40,7 +36,7 @@ class DataFileParser():
         self.file_obj = f_obj
         self.file_type = f_type.lower()
         self.delimiter = delimiter
-        self.many = many
+        self.cols = cols
         self.errors = None
         self.default_message = "No errors found."
         self.x_data = []
@@ -244,26 +240,46 @@ class DataFileParser():
         at a particular wavelength.
         """
 
-        x_data = []
-        y_data = []
+        col_1 = []
+        col_2 = []
+        col_3 = []
+        col_4 = []
 
         rows = self.file_obj.readlines()
 
         for i, r in enumerate(rows):
 
             r_strip = r.strip('\n')
-            r_split = r_strip.split('\t')
+            r_split = r_strip.split(self.delimiter)
 
             try:
-                x_data.append(float(r_split[0]))
-                y_data.append(float(r_split[1]))
+                col_1.append(float(r_split[0]))
+                col_2.append(float(r_split[1]))
+
+                # read more columns if > 2
+                if self.cols == 4:
+                    col_3.append(float(r_split[2]))
+                    col_4.append(float(r_split[3]))
+
             except:
                 pass
 
-        self.x_data = x_data
-        self.y_data = y_data
+        if self.cols == 2:
+            self.x_data = col_1
+            self.y_data = col_2
 
-        return (x_data, y_data)
+        elif self.cols == 4:
+
+            self.x_data = col_1
+
+            col_2 = np.asarray(col_2)
+            col_3 = np.asarray(col_3)
+            col_4 = np.asarray(col_4)
+
+            y_vals = (col_4 - col_2) / (col_3 - col_2)
+            self.y_data = y_vals.tolist()
+
+        return (self.x_data, self.y_data)
 
     """ begin client validators """
     def _is_csv_valid(self):
@@ -421,7 +437,7 @@ class DataFileParser():
             for i, r in enumerate(rows):
 
                 r_strip = r.strip('\n')
-                r_split = r_strip.split('\t')
+                r_split = r_strip.split(self.delimiter)
 
 
                 try:
